@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProjectBrain (projectbrain-mcp) — AST Context Compiler & Setup Guide for AI Agents</title>
+  <meta name="description" content="Local-first AST Context Compiler, Closed-World Engineering Dossier, and Surgical Anchor Patch Engine for AI Coding Agents. Cuts token bills by 60–65%." />
+  <style>
+    /* ── Reset & Base ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0f19;
+      --surface:   #131825;
+      --border:    #1e2536;
+      --text:      #c9d1d9;
+      --text-dim:  #7d8590;
+      --heading:   #e6edf3;
+      --accent:    #58a6ff;
+      --accent-2:  #3fb950;
+      --accent-3:  #d2a8ff;
+      --code-bg:   #161b22;
+      --code-text: #c9d1d9;
+      --radius:    8px;
+      --max-w:     980px;
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Typography ────────────────────────────────────────────────── */
+    h1, h2, h3 { color: var(--heading); font-weight: 600; letter-spacing: -0.02em; }
+    h1 { font-size: 2.75rem; line-height: 1.15; }
+    h2 { font-size: 1.75rem; line-height: 1.3; margin-bottom: 1rem; }
+    h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+    p  { margin-bottom: 1rem; }
+    a  { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    code, pre {
+      font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+      font-size: 0.875rem;
+    }
+
+    code {
+      background: var(--code-bg);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      line-height: 1.55;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: var(--code-text);
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────────── */
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
+
+    section {
+      padding: 4.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    section:last-of-type { border-bottom: none; }
+
+    /* ── Nav ────────────────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11, 15, 25, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 0;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--heading);
+      letter-spacing: -0.01em;
+    }
+
+    .nav-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+
+    .nav-links a {
+      color: var(--text-dim);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--heading); text-decoration: none; }
+
+    /* ── Hero ───────────────────────────────────────────────────────── */
+    .hero {
+      padding: 6.5rem 0 4.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero h1 { margin-bottom: 1.25rem; }
+    .hero h1 span { color: var(--accent); }
+
+    .hero .subtitle {
+      font-size: 1.15rem;
+      color: var(--text-dim);
+      max-width: 720px;
+      margin: 0 auto 2.25rem;
+      line-height: 1.65;
+    }
+
+    .hero-install-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hero-install {
+      display: inline-block;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1.75rem;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 0.95rem;
+      color: var(--accent-2);
+      letter-spacing: 0.01em;
+      text-align: left;
+    }
+
+    .hero-badges {
+      margin-top: 1.75rem;
+      display: flex;
+      justify-content: center;
+      gap: 1.75rem;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .hero-badges span { white-space: nowrap; }
+
+    /* ── Setup Steps ────────────────────────────────────────────────── */
+    .setup-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .setup-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      color: var(--heading);
+    }
+
+    .setup-step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .setup-card p {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    .setup-card pre { margin-bottom: 0.5rem; }
+
+    /* ── Problem ────────────────────────────────────────────────────── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+    }
+
+    .problem-card h3 { color: var(--text-dim); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+    .problem-card p { margin-bottom: 0; color: var(--text); }
+    .problem-card .highlight { color: var(--heading); font-weight: 500; }
+
+    /* ── How It Works ──────────────────────────────────────────────── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+      margin-top: 2rem;
+    }
+
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem 1.5rem;
+    }
+
+    .step-number {
+      display: inline-block;
+      width: 2rem;
+      height: 2rem;
+      line-height: 2rem;
+      text-align: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .step h3 { margin-bottom: 0.5rem; }
+    .step p  { color: var(--text-dim); margin-bottom: 0; font-size: 0.925rem; }
+
+    /* ── Features ───────────────────────────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .feature {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+    }
+
+    .feature h3 { color: var(--heading); }
+    .feature p  { color: var(--text-dim); margin-bottom: 0; font-size: 0.925rem; }
+
+    .feature-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.2em 0.6em;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+
+    .tag-core     { background: rgba(88,166,255,0.15); color: var(--accent); }
+    .tag-unique   { background: rgba(210,168,255,0.15); color: var(--accent-3); }
+    .tag-roi      { background: rgba(63,185,80,0.15); color: var(--accent-2); }
+
+    /* ── Comparison / Benchmarks ───────────────────────────────────── */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      text-align: left;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comparison-table th {
+      color: var(--text-dim);
+      font-weight: 500;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .comparison-table td:first-child { color: var(--heading); font-weight: 500; }
+
+    .check   { color: var(--accent-2); font-weight: 600; }
+    .cross   { color: var(--text-dim); }
+    .partial { color: #d29922; }
+
+    /* ── Code Demo ─────────────────────────────────────────────────── */
+    .demo-block { margin-top: 1.75rem; }
+
+    .demo-block .demo-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    .comment { color: #6e7681; }
+    .keyword { color: #ff7b72; }
+    .string  { color: #a5d6ff; }
+    .fn      { color: #d2a8ff; }
+    .param   { color: #ffa657; }
+    .type    { color: #79c0ff; }
+
+    /* ── CTA ────────────────────────────────────────────────────────── */
+    .cta {
+      text-align: center;
+      padding: 5rem 0;
+    }
+
+    .cta h2 { margin-bottom: 1rem; }
+    .cta p  { color: var(--text-dim); max-width: 580px; margin: 0 auto 2rem; }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.75rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: opacity 0.2s, transform 0.15s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn:hover { text-decoration: none; opacity: 0.9; transform: translateY(-1px); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--heading);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.825rem;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      .hero { padding: 4rem 0 3rem; }
+      section { padding: 3.5rem 0; }
+      .problem-grid, .features-grid, .steps { grid-template-columns: 1fr; }
+      .nav-links { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Nav ─────────────────────────────────────────────────────── -->
+  <nav>
+    <div class="container">
+      <div class="nav-brand">ProjectBrain <code>projectbrain-mcp</code></div>
+      <div class="nav-links">
+        <a href="#setup">Setup Guide</a>
+        <a href="#workflow">Daily Workflow</a>
+        <a href="#benchmarks">Benchmarks</a>
+        <a href="#features">Capabilities</a>
+        <a href="#compare">Comparison</a>
+        <a href="https://pypi.org/project/projectbrain-mcp/" target="_blank">PyPI</a>
+        <a href="https://github.com/Johanabhishek/projectbrain-docs" target="_blank">GitHub Docs</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Hero ────────────────────────────────────────────────────── -->
+  <header class="hero">
+    <div class="container">
+      <h1>Surgical AST Context &amp; Patching<br />for <span>AI Coding Agents</span></h1>
+      <p class="subtitle">
+        Local-first AST Context Compiler, Closed-World Engineering Dossier, and Surgical Anchor Patch Engine.
+        Cuts AI agent token bills by <strong>60%&ndash;65%</strong> and speeds up multi-file debugging by <strong>30%&ndash;42%</strong>.
+      </p>
+      <div class="hero-install-group">
+        <div class="hero-install">
+          pip install projectbrain-mcp<br />
+          projectbrain --path /path/to/your/repo init
+        </div>
+      </div>
+      <div class="hero-badges">
+        <span>&#9889; ~90ms Tree-sitter Index</span>
+        <span>&#128274; 100% Local &amp; Offline</span>
+        <span>&#128176; -81% to -88% Input Tokens</span>
+        <span>&#9986; -63% to -77% Edit Output Tokens</span>
+        <span>&#129302; Claude Code &bull; Cursor &bull; Windsurf &bull; Antigravity</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Complete Setup Guide ────────────────────────────────────── -->
+  <section id="setup">
+    <div class="container">
+      <h2>Complete Setup Guide (60 Seconds)</h2>
+      <p>Set up ProjectBrain on any repository so your AI coding agent stops running blind <code>grep</code> loops and full-file reads.</p>
+
+      <div class="setup-card">
+        <h3><span class="setup-step-badge">Step 1</span> Install from PyPI</h3>
+        <p>Install the official <code>projectbrain-mcp</code> package globally (exposes both the <code>projectbrain</code> CLI and <code>projectbrain-mcp</code> server):</p>
+        <pre><code>pip install projectbrain-mcp
+
+<span class="comment"># Verify CLI and MCP server binaries are on PATH:</span>
+projectbrain --help
+projectbrain-mcp --help</code></pre>
+      </div>
+
+      <div class="setup-card">
+        <h3><span class="setup-step-badge">Step 2</span> Initialize Your Repository in One Command</h3>
+        <p>Run <code>projectbrain init</code> inside your repository (or pass <code>--path</code>):</p>
+        <pre><code>projectbrain --path /path/to/your/repo init</code></pre>
+        <p style="margin-top: 0.75rem; margin-bottom: 0;">
+          <strong>What <code>init</code> automatically sets up:</strong><br />
+          1. Indexes your codebase into <code>.projectbrain.json</code> and <code>.projectbrain_graph.json</code> in ~90ms.<br />
+          2. Updates <code>.gitignore</code> so index caches never pollute Git.<br />
+          3. Creates <code>.mcp.json</code> for Claude Code, Cursor, Windsurf, and Google Antigravity.<br />
+          4. Creates <code>.agents/rules/projectbrain.md</code> and <code>AGENTS.md</code> so agents automatically compile a single-read dossier first.
+        </p>
+      </div>
+
+      <div class="setup-card">
+        <h3><span class="setup-step-badge">Step 3</span> MCP Server Configuration (or Zero-Install via <code>uvx</code>)</h3>
+        <p>If your IDE uses a global MCP config file (<code>.cursor/mcp.json</code>, <code>claude_desktop_config.json</code>, or Antigravity <code>mcp_config.json</code>), add:</p>
+        <pre><code>{
+  <span class="string">"mcpServers"</span>: {
+    <span class="string">"projectbrain"</span>: {
+      <span class="string">"command"</span>: <span class="string">"projectbrain-mcp"</span>,
+      <span class="string">"args"</span>: [<span class="string">"/path/to/your/repo"</span>]
+    }
+  }
+}
+
+<span class="comment">// Or run with zero manual install via uvx:</span>
+{
+  <span class="string">"mcpServers"</span>: {
+    <span class="string">"projectbrain"</span>: {
+      <span class="string">"command"</span>: <span class="string">"uvx"</span>,
+      <span class="string">"args"</span>: [<span class="string">"projectbrain-mcp"</span>, <span class="string">"/path/to/your/repo"</span>]
+    }
+  }
+}</code></pre>
+      </div>
+
+      <div class="setup-card">
+        <h3><span class="setup-step-badge">Step 4</span> Parent / Monorepo Workspace Rule (Important for Nested Repos)</h3>
+        <p>If you open a <strong>parent directory</strong> in your IDE (e.g., <code>/workspace</code> containing <code>/workspace/my-app</code>), place an <code>AGENTS.md</code> (or <code>.agents/rules/projectbrain.md</code>) at the <strong>workspace root</strong> and pass <code>--path "&lt;subfolder&gt;"</code> so the agent always triggers ProjectBrain from the parent folder:</p>
+        <pre><code><span class="comment"># ProjectBrain Mandatory Codebase Investigation &amp; Editing Rules</span>
+
+1. <span class="keyword">Compile a Single-Read Engineering Dossier:</span>
+   projectbrain --path <span class="string">"&lt;subfolder&gt;"</span> dossier <span class="string">"&lt;question_or_bug&gt;"</span>
+   Immediately read <span class="string">&lt;subfolder&gt;/.projectbrain_dossier.md</span> in one read_file call (StartLine=1, EndLine=800).
+
+2. <span class="keyword">Surgical Symbol Slicing:</span>
+   projectbrain --path <span class="string">"&lt;subfolder&gt;"</span> slice --summary &lt;file:symbol_or_start-end&gt;
+
+3. <span class="keyword">Surgical Anchor Patching:</span>
+   projectbrain --path <span class="string">"&lt;subfolder&gt;"</span> patch --spec <span class="string">"&lt;Anchor Patch DSL&gt;"</span> --apply</code></pre>
+      </div>
+
+      <div class="setup-card">
+        <h3><span class="setup-step-badge">Step 5</span> Keep Git Clean (<code>.gitignore</code>)</h3>
+        <p>Add these patterns to <code>.gitignore</code> to keep all local ProjectBrain caches, dossiers, diffs, and agent rule files untracked:</p>
+        <pre><code><span class="comment"># ProjectBrain (local dev only)</span>
+.projectbrain*
+*.projectbrain*
+**/.projectbrain*
+project_brain.py
+test_projectbrain.json
+.mcp.json
+.agents/
+AGENTS.md
+CLAUDE.md
+.claude/settings.json</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Daily Workflow & Live ROI Dashboard ─────────────────────── -->
+  <section id="workflow">
+    <div class="container">
+      <h2>Daily CLI Workflow &amp; Live ROI Dashboard</h2>
+      <p>Use ProjectBrain directly from your terminal or let your AI coding agent invoke it automatically via CLI or MCP.</p>
+
+      <div class="demo-block">
+        <div class="demo-label">1. Compile a Single-Read Engineering Dossier (<code>dossier</code>)</div>
+        <pre><code><span class="comment"># Compiles module constants, folded AST slices, 1-3 hop call chains,</span>
+<span class="comment"># and a Closed-World Exhaustive Repo Scan into .projectbrain_dossier.md (&lt;800 lines)</span>
+$ projectbrain --path /path/to/repo dossier <span class="string">"what role does questionnaire have in onboarding"</span></code></pre>
+      </div>
+
+      <div class="demo-block">
+        <div class="demo-label">2. Surgically Slice Specific Symbols (<code>slice</code>)</div>
+        <pre><code><span class="comment"># Extract exact AST lines for 1-2 symbols without reading full files</span>
+$ projectbrain --path /path/to/repo slice --summary src/App.tsx:ProtectedRoute src/data/questionnaireData.ts:calculatePersona</code></pre>
+      </div>
+
+      <div class="demo-block">
+        <div class="demo-label">3. Apply Surgical Anchor Patches (<code>patch</code>)</div>
+        <pre><code><span class="comment"># Cuts edit output tokens by 65-80% with instant Tree-sitter syntax validation</span>
+$ projectbrain --path /path/to/repo patch --apply --spec <span class="string">"@file src/App.tsx
+@sub L84 \`!profileCompleted\` -&gt; \`isHydrated &amp;&amp; !profileCompleted\`"</span></code></pre>
+      </div>
+
+      <div class="demo-block">
+        <div class="demo-label">4. Live ROI &amp; Token Savings Dashboard (<code>stats --summary</code>)</div>
+        <pre><code>$ projectbrain --path /path/to/repo stats --summary
+===============================================================
+  ProjectBrain Token Reduction Ledger
+===============================================================
+  Repository         : /path/to/repo
+  Total Operations   : 4
+  Input Tokens Saved : 504,441 tok (16,156 delivered vs 520,597 baseline -&gt; -96.9%)
+  Output Tokens Saved: 190 tok (85 spec vs 275 edit_file -&gt; -69.1%)
+  Tool Calls Avoided : 22 file reads / multi-turn edits
+===============================================================
+
+<span class="comment"># Auto-refresh every 2 seconds in PowerShell:</span>
+$ while ($true) { cls; projectbrain --path <span class="string">"/path/to/repo"</span> stats --summary; Start-Sleep 2 }
+
+<span class="comment"># Auto-refresh every 2 seconds in Bash/Zsh:</span>
+$ watch -n 2 projectbrain --path /path/to/repo stats --summary
+
+<span class="comment"># Reset ledger:</span>
+$ projectbrain --path /path/to/repo stats --reset</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Verified A/B Benchmarks ─────────────────────────────────── -->
+  <section id="benchmarks">
+    <div class="container">
+      <h2>Verified A/B Benchmark Results (142-File Production Repo)</h2>
+      <p>Measured across real multi-turn agent trajectories comparing a baseline agent (without ProjectBrain) against a ProjectBrain-enabled agent.</p>
+
+      <div style="overflow-x: auto;">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Benchmark Scenario</th>
+              <th>Metric</th>
+              <th>Baseline Agent (No Brain)</th>
+              <th>ProjectBrain Agent</th>
+              <th>Improvement</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Scenario 1: Targeted 3-Part Analysis</strong></td>
+              <td>Code Output Ingested</td>
+              <td><code>67,319</code> tok</td>
+              <td><strong><code>12,569</code> tok</strong></td>
+              <td class="check">-81.3% (5.35x smaller)</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Total Prompt Tokens Billed</td>
+              <td><code>655,391</code> tok</td>
+              <td><strong><code>155,052</code> tok</strong></td>
+              <td class="check">-76.3% (4.23x fewer)</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>File Reads (<code>read_file</code>)</td>
+              <td><code>16</code></td>
+              <td><strong><code>2</code></strong></td>
+              <td class="check">-87.5%</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Net API Cost</td>
+              <td><code>$0.6723</code></td>
+              <td><strong><code>$0.2590</code></strong></td>
+              <td class="check">-61.5% (2.60x cheaper)</td>
+            </tr>
+            <tr>
+              <td><strong>Scenario 2: Open-Ended Bug Report</strong></td>
+              <td>Code Output Ingested</td>
+              <td><code>351,658</code> tok</td>
+              <td><strong><code>40,982</code> tok</strong></td>
+              <td class="check">-88.3% (8.58x smaller)</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Total Prompt Tokens Billed</td>
+              <td><code>4,561,692</code> tok</td>
+              <td><strong><code>1,220,579</code> tok</strong></td>
+              <td class="check">-73.2% (-3.34M tokens)</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>File Reads (<code>read_file</code>)</td>
+              <td><code>84</code> (19 re-reads)</td>
+              <td><strong><code>6</code> (0 re-reads)</strong></td>
+              <td class="check">-92.9% (14.0x fewer)</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Multi-File Patch Output Tokens</td>
+              <td><code>3,359</code> tok (<code>edit_file</code>)</td>
+              <td><strong><code>529 &ndash; 1,237</code> tok</strong></td>
+              <td class="check">-63.2% to -77.3%</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>Net API Cost</td>
+              <td><code>$3.2712</code></td>
+              <td><strong><code>$1.1557</code></strong></td>
+              <td class="check">-64.7% (2.83x cheaper)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Core Capabilities ───────────────────────────────────────── -->
+  <section id="features">
+    <div class="container">
+      <h2>Core Capabilities</h2>
+      <div class="features-grid">
+        <div class="feature">
+          <div class="feature-tag tag-core">Input Saver</div>
+          <h3>Single-Read Engineering Dossier (<code>brain_dossier</code>)</h3>
+          <p>Compiles module globals, smart-folded AST function slices, 1&ndash;3 hop bidirectional call chains, and a Closed-World Exhaustive Repo Scan into a single <code>&lt;800</code>-line <code>.projectbrain_dossier.md</code>.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-tag tag-unique">Output Saver</div>
+          <h3>Surgical Anchor Patching (<code>brain_patch</code>)</h3>
+          <p>Replaces verbose before/after blocks in <code>edit_file</code> with compact anchor specs (<code>@file</code>, <code>@sub</code>, <code>@replace</code>, <code>@insert_after</code>, <code>@delete</code>) validated by Tree-sitter in <code>&lt;5ms</code>.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-tag tag-roi">Telemetry</div>
+          <h3>Live ROI &amp; Savings Ledger (<code>brain_stats</code>)</h3>
+          <p>Automatically records every dossier, slice, and patch operation to <code>.projectbrain_ledger.json</code>, reporting input/output tokens saved and tool calls avoided.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-tag tag-unique">Anti-Hallucination</div>
+          <h3>3-Valued Verification (<code>brain_check</code>)</h3>
+          <p>Verifies structural claims (<code>SUPPORTED</code>, <code>REFUTED</code>, <code>UNKNOWN</code>) and edit plans against the parsed code graph with zero false refutations.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-tag tag-core">Memory</div>
+          <h3>AST-Anchored Repo Memory (<code>brain_remember</code>)</h3>
+          <p>Pins architectural invariants to specific symbols in <code>.projectbrain_memory.json</code> and automatically flags <code>[STALE WARNING]</code> when a function's AST hash changes.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-tag tag-core">Graph</div>
+          <h3>Cross-Framework Route &amp; Import Resolution</h3>
+          <p>Resolves Python relative/symbol imports, TypeScript path aliases (<code>@/</code>, <code>~/</code>), and FastAPI, Flask, Django, Express, and Next.js routes out of the box.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Comparison ──────────────────────────────────────────────── -->
+  <section id="compare">
+    <div class="container">
+      <h2>How ProjectBrain Compares</h2>
+      <div style="overflow-x: auto;">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th>Aider Repo-Map</th>
+              <th>Serena (LSP)</th>
+              <th>CodeGraph</th>
+              <th>ProjectBrain (<code>projectbrain-mcp</code>)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Zero-setup speed</td>
+              <td class="check">Fast (Tree-sitter)</td>
+              <td class="cross">Heavy LSP startup</td>
+              <td class="check">Fast</td>
+              <td class="check">~90ms (Tree-sitter C wheels)</td>
+            </tr>
+            <tr>
+              <td>Single-read &lt;800-line Dossier</td>
+              <td class="cross">Signatures only</td>
+              <td class="cross">Symbol bodies</td>
+              <td class="cross">Graph nodes only</td>
+              <td class="check">Folded AST slices + Call chains + Globals</td>
+            </tr>
+            <tr>
+              <td>Closed-world state/route scan</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="check">Yes (Exhaustive Guarantee)</td>
+            </tr>
+            <tr>
+              <td>Surgical Anchor Patch Engine</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="check">Yes (-63% to -77% output tokens)</td>
+            </tr>
+            <tr>
+              <td>AST-anchored persistent memory</td>
+              <td class="cross">No</td>
+              <td class="partial">Manual markdown</td>
+              <td class="cross">No</td>
+              <td class="check">Yes (auto-flags stale AST hashes)</td>
+            </tr>
+            <tr>
+              <td>Live Token &amp; ROI Ledger</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="check">Yes (<code>projectbrain stats --summary</code>)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ─────────────────────────────────────────────────────── -->
+  <section class="cta">
+    <div class="container">
+      <h2>Get Started in 60 Seconds</h2>
+      <p>Install from PyPI, run <code>projectbrain init</code> on your repository, and watch your AI coding agent cut token usage by 60%&ndash;65%.</p>
+      <div class="cta-buttons">
+        <a href="https://pypi.org/project/projectbrain-mcp/" class="btn btn-primary" target="_blank">Install from PyPI</a>
+        <a href="https://github.com/Johanabhishek/projectbrain-docs" class="btn btn-secondary" target="_blank">View Setup Docs on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <p>ProjectBrain (<code>projectbrain-mcp</code>) &mdash; Local-first AST context compiler &amp; surgical patching engine for AI coding agents. Available on <a href="https://pypi.org/project/projectbrain-mcp/" target="_blank">PyPI</a>.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
